@@ -13,11 +13,14 @@ type Address = {
 };
 
 const CepSearch = () => {
+  const [hasError, setHasError] = useState(false);
+
   const [address, setAddress] = useState<Address>();
 
   const [formData, setFormData] = useState<FormData>({
     cep: "",
   });
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -27,19 +30,27 @@ const CepSearch = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    axios.get(`https://viacep.com.br/ws/${formData.cep}/json/`)
-    .then(response => {
-      setAddress(response.data);
-    })
-    .catch((error) => {
-      setAddress(undefined);
-    });
+    axios
+      .get(`https://viacep.com.br/ws/${formData.cep}/json/`)
+      .then((response) => {
+        setHasError(false);
+        setAddress(response.data);
+      })
+      .catch((error) => {
+        setHasError(true);
+        setAddress(undefined);
+      });
   };
 
   return (
     <div className="cep-search-container">
       <h1 className="text-primary">Busca CEP</h1>
       <div className="container search-container">
+        {hasError && (
+          <div className="alert alert-danger">
+            Cep invalido... tente novamente com um cep valido!
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-container">
             <input
